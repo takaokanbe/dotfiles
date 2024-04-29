@@ -1,0 +1,12 @@
+format = """
+$directory\
+$git_branch\
+$git_status\
+$line_break\
+$character"""
+
+# not insert a blank line between shell prompts
+add_newline = false
+
+[directory]
+read_only = ""
