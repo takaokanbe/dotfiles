@@ -1,0 +1,22 @@
+[user]
+	name = takaokanbe
+	email = takaokanbe@users.noreply.github.com
+[color]
+	ui = auto
+[color "status"]
+	added = yellow
+	changed = cyan
+	untracked = red
+[url "ssh://git@github.com"]
+	insteadOf = https://github.com
+[init]
+	defaultBranch = main
+[alias]
+	st = status
+	br = branch
+	df = diff
+	s = switch
+	graph = log --pretty='format:%C(yellow)%h %C(white)%s %C(red)%d %C(green)<%as,%an>' --graph
+[pull]
+	ff = only
+	rebase = true
