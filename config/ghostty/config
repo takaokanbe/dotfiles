@@ -1,0 +1,20 @@
+theme = catppuccin-mocha
+
+font-family = FiraMono Nerd Font Mono
+font-feature = -calt
+font-feature = -liga
+font-feature = -dlig
+font-size = 16
+
+macos-titlebar-style = tabs
+macos-titlebar-proxy-icon = hidden
+
+window-padding-x = 20
+window-padding-y = 5
+window-padding-balance = true
+background-opacity = 0.9
+background-blur = 5
+
+mouse-hide-while-typing
+
+resize-overlay = never
