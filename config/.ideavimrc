@@ -4,7 +4,7 @@ set clipboard+=unnamed
 set incsearch
 set ignorecase
 set smartcase
-set scrolloff=5
+set scrolloff=10
 
 nnoremap <C-l> gt
 nnoremap <C-h> gT
@@ -14,12 +14,12 @@ nmap gd <Action>(GotoDeclaration)
 nmap <leader>fa <Action>(GotoAction)
 nmap <leader>fe <Action>(SearchEverywhere)
 nmap <leader>ff <Action>(GotoFile)
-nmap <leader>fw <Action>(FindInPath)
+nmap <leader>fg <Action>(FindInPath)
 nmap <leader>ca <Action>(CloseAllEditors)
-nmap <Leader>k <Action>(ShowHoverInfo)
+nmap K <Action>(ShowHoverInfo)
 nmap <leader>r <Action>(RenameElement)
 nmap <leader>e <Action>(ActivateProjectToolWindow)
+nmap <leader>b <Action>(ActivateBookmarksToolWindow)
 nmap <leader>q <Action>(HideAllWindows)
 nmap <Leader>wo <Action>(MoveEditorToOppositeTabGroup)
 nmap <Leader>wl <Action>(MoveTabRight)
-

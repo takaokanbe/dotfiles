@@ -9,6 +9,9 @@ echo "Creating symbolic links..."
 ln -sf "$DOTFILES_DIR/config/starship/starship.toml" ~/.config/starship.toml
 
 # Git
-ln -sf "$DOTFILES_DIR/config/git" ~/.config/git
+ln -sfn "$DOTFILES_DIR/config/git" ~/.config/git
+
+# IdeaVim
+ln -sf "$DOTFILES_DIR/config/.ideavimrc" ~/.ideavimrc
 
 echo "Done."
