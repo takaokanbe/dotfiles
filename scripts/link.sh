@@ -15,6 +15,6 @@ ln -sfn "$DOTFILES_DIR/config/git" ~/.config/git
 ln -sfn "$DOTFILES_DIR/config/ghostty" ~/.config/ghostty
 
 # IdeaVim
-ln -sf "$DOTFILES_DIR/config/.ideavimrc" ~/.ideavimrc
+ln -sf "$DOTFILES_DIR/config/ideavim/.ideavimrc" ~/.ideavimrc
 
 echo "Done."
