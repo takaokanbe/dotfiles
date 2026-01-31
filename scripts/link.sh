@@ -14,6 +14,9 @@ ln -sfn "$DOTFILES_DIR/config/git" ~/.config/git
 # Ghostty
 ln -sfn "$DOTFILES_DIR/config/ghostty" ~/.config/ghostty
 
+# Neovim
+ln -sfn "$DOTFILES_DIR/config/nvim" ~/.config/nvim
+
 # IdeaVim
 ln -sf "$DOTFILES_DIR/config/ideavim/.ideavimrc" ~/.ideavimrc
 
