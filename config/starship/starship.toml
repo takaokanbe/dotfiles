@@ -2,8 +2,19 @@ format = """
 $directory\
 $git_branch\
 $git_status\
+$gcloud\
+$kubernetes\
 $line_break\
 $character"""
 
 [directory]
 read_only = ""
+
+[gcloud]
+format = 'on [$symbol$active]($style) '
+symbol = '󱇶 '
+
+[kubernetes]
+disabled = false
+format = '[$symbol$context( \($namespace\))]($style) '
+
