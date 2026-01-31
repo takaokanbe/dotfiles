@@ -1,6 +1,6 @@
 [user]
 	name = takaokanbe
-	email = takaokanbe@users.noreply.github.com
+	email = 62293842+takaokanbe@users.noreply.github.com
 [color]
 	ui = auto
 [color "status"]
@@ -16,7 +16,7 @@
 	br = branch
 	df = diff
 	s = switch
-	graph = log --pretty='format:%C(yellow)%h %C(white)%s %C(red)%d %C(green)<%as,%an>' --graph
+	g = log --pretty='format:%C(yellow)%h %C(white)%s %C(red)%d %C(green)<%as,%an>' --graph
 [pull]
 	ff = only
 	rebase = true
