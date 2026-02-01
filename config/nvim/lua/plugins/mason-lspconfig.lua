@@ -84,7 +84,10 @@ return {
           },
         },
         on_attach = function()
+          local group = vim.api.nvim_create_augroup("GoplsFormat", { clear = true })
           vim.api.nvim_create_autocmd("BufWritePre", {
+            group = group,
+            pattern = "*.go",
             callback = function()
               local params = vim.lsp.util.make_range_params()
               params.context = { only = { "source.organizeImports" } }
@@ -113,7 +116,9 @@ return {
       },
       terraformls = {
         on_attach = function()
+          local group = vim.api.nvim_create_augroup("TerraformFormat", { clear = true })
           vim.api.nvim_create_autocmd("BufWritePre", {
+            group = group,
             pattern = { "*.tf", "*.tfvars" },
             callback = function()
               vim.lsp.buf.format({ async = false })

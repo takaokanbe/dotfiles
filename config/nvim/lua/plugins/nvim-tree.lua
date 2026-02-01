@@ -7,7 +7,6 @@ return {
   },
   keys = {
     {mode = "n", "<leader>e", "<cmd>NvimTreeToggle<CR>", desc = "toggle NvimTree"},
-    {mode = "n", "<leader>f", "<cmd>NvimTreeFocus<CR>", desc = "toggle NvimTree"},
   },
   config = function()
     require("nvim-tree").setup {}
