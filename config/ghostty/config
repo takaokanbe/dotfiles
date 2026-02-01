@@ -14,7 +14,7 @@ window-padding-x = 20
 window-padding-y = 20
 window-padding-balance = true
 
-background-opacity = 0.8
+background-opacity = 0.9
 background-blur = 5
 
 cursor-opacity = 0.6
