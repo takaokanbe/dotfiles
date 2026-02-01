@@ -10,6 +10,8 @@ plugin manager には [lazy.nvim](https://github.com/folke/lazy.nvim) を使用�
 | Fuzzy Finder | [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) | ファイル・テキスト検索 |
 | LSP | [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig) | LSP 設定 |
 | LSP Manager | [mason.nvim](https://github.com/williamboman/mason.nvim) / [mason-lspconfig.nvim](https://github.com/williamboman/mason-lspconfig.nvim) | LSP サーバーのインストール・管理 |
+| Formatter | [conform.nvim](https://github.com/stevearc/conform.nvim) | 保存時自動フォーマット |
+| Linter | [nvim-lint](https://github.com/mfussenegger/nvim-lint) | 非同期リント |
 | 補完 | [nvim-cmp](https://github.com/hrsh7th/nvim-cmp) | 自動補完エンジン |
 | Syntax Highlight | [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) | Tree-sitter ベースの構文ハイライト |
 | Colorscheme | [catppuccin](https://github.com/catppuccin/nvim) | カラースキーム (mocha) |
