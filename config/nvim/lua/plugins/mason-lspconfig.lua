@@ -6,6 +6,7 @@ return {
     "williamboman/mason.nvim",
     "neovim/nvim-lspconfig",
     "hrsh7th/cmp-nvim-lsp",
+    "b0o/schemastore.nvim",
   },
   config = function()
     local capabilities = require("cmp_nvim_lsp").default_capabilities()
@@ -120,6 +121,27 @@ return {
           })
         end,
       },
+      ts_ls = {},
+      jsonls = {
+        settings = {
+          json = {
+            schemas = require("schemastore").json.schemas(),
+            validate = { enable = true },
+          },
+        },
+      },
+      yamlls = {
+        settings = {
+          yaml = {
+            schemaStore = {
+              enable = false,
+              url = "",
+            },
+            schemas = require("schemastore").yaml.schemas(),
+          },
+        },
+      },
+      marksman = {},
     }
 
     require("mason-lspconfig").setup({
