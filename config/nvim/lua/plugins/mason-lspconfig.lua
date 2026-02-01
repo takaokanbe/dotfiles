@@ -83,27 +83,6 @@ return {
             staticcheck = true,
           },
         },
-        on_attach = function()
-          local group = vim.api.nvim_create_augroup("GoplsFormat", { clear = true })
-          vim.api.nvim_create_autocmd("BufWritePre", {
-            group = group,
-            pattern = "*.go",
-            callback = function()
-              local params = vim.lsp.util.make_range_params()
-              params.context = { only = { "source.organizeImports" } }
-              local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params)
-              for cid, res in pairs(result or {}) do
-                for _, r in pairs(res.result or {}) do
-                  if r.edit then
-                    local enc = (vim.lsp.get_client_by_id(cid) or {}).offset_encoding or "utf-16"
-                    vim.lsp.util.apply_workspace_edit(r.edit, enc)
-                  end
-                end
-              end
-              vim.lsp.buf.format({ async = false })
-            end,
-          })
-        end,
       },
       lua_ls = {
         settings = {
@@ -114,18 +93,7 @@ return {
           },
         },
       },
-      terraformls = {
-        on_attach = function()
-          local group = vim.api.nvim_create_augroup("TerraformFormat", { clear = true })
-          vim.api.nvim_create_autocmd("BufWritePre", {
-            group = group,
-            pattern = { "*.tf", "*.tfvars" },
-            callback = function()
-              vim.lsp.buf.format({ async = false })
-            end,
-          })
-        end,
-      },
+      terraformls = {},
       ts_ls = {},
       jsonls = {
         settings = {
