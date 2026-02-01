@@ -13,8 +13,10 @@ return {
   },
   config = function(_, opts)
     require('barbar').setup(opts)
-    vim.keymap.set('n', '[b', '<Cmd>BufferPrevious<CR>', { silent = true })
-    vim.keymap.set('n', ']b', '<Cmd>BufferNext<CR>', { silent = true })
-    vim.keymap.set('n', '<leader>bd', '<Cmd>BufferClose<CR>', { silent = true })
+    vim.keymap.set('n', '<S-h>', '<Cmd>BufferPrevious<CR>', { silent = true, desc = "Prev Buffer" })
+    vim.keymap.set('n', '<S-l>', '<Cmd>BufferNext<CR>', { silent = true, desc = "Next Buffer" })
+    vim.keymap.set('n', '[b', '<Cmd>BufferPrevious<CR>', { silent = true, desc = "Prev Buffer" })
+    vim.keymap.set('n', ']b', '<Cmd>BufferNext<CR>', { silent = true, desc = "Next Buffer" })
+    vim.keymap.set('n', '<leader>bd', '<Cmd>BufferClose<CR>', { silent = true, desc = "Delete Buffer" })
   end,
 }
