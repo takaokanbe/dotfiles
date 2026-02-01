@@ -20,4 +20,10 @@ ln -sfn "$DOTFILES_DIR/config/nvim" ~/.config/nvim
 # IdeaVim
 ln -sf "$DOTFILES_DIR/config/ideavim/.ideavimrc" ~/.ideavimrc
 
+# Claude Code
+mkdir -p ~/.claude
+ln -sf "$DOTFILES_DIR/config/claude/settings.json" ~/.claude/settings.json
+ln -sf "$DOTFILES_DIR/config/claude/statusline.sh" ~/.claude/statusline.sh
+ln -sfn "$DOTFILES_DIR/config/claude/skills" ~/.claude/skills
+
 echo "Done."
