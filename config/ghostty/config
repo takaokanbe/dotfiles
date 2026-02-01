@@ -11,10 +11,10 @@ macos-titlebar-style = tabs
 macos-titlebar-proxy-icon = hidden
 
 window-padding-x = 20
-window-padding-y = 5
+window-padding-y = 20
 window-padding-balance = true
-window-inherit-working-directory = false
-background-opacity = 0.9
+
+background-opacity = 0.8
 background-blur = 5
 
 cursor-opacity = 0.6
@@ -22,4 +22,5 @@ cursor-opacity = 0.6
 mouse-hide-while-typing
 
 resize-overlay = never
+
 keybind = shift+enter=text:\n
