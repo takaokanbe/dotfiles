@@ -110,9 +110,20 @@ return {
           },
         },
       },
+      terraformls = {
+        on_attach = function()
+          vim.api.nvim_create_autocmd("BufWritePre", {
+            pattern = { "*.tf", "*.tfvars" },
+            callback = function()
+              vim.lsp.buf.format({ async = false })
+            end,
+          })
+        end,
+      },
     }
 
     require("mason-lspconfig").setup({
+      ensure_installed = vim.tbl_keys(server_configs),
       handlers = {
         function(server_name)
           local opts = { capabilities = capabilities }
