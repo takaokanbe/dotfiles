@@ -20,13 +20,18 @@
       "Bash(wc:*)",
       "Bash(pwd)",
       "Bash(which:*)",
+      "Bash(xargs find)",
       "Bash(git status:*)",
       "Bash(git branch:*)",
       "Bash(git checkout:*)",
       "Bash(git log:*)",
+      "Bash(git ls-tree:*)",
       "Bash(git diff:*)",
       "Bash(git fetch:*)",
-      "Bash(git show:*)"
+      "Bash(git show:*)",
+      "WebFetch(domain:developer.hashicorp.com)",
+      "WebFetch(domain:cloud.google.com)",
+      "WebFetch(domain:docs.google.com)"
     ],
     "ask": [
       "Bash(rm:*)",
