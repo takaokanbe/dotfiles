@@ -42,14 +42,6 @@
       "WebFetch(domain:cloud.google.com)",
       "WebFetch(domain:docs.google.com)"
     ],
-    "ask": [
-      "Bash(rm:*)",
-      "Bash(chmod:*)",
-      "Bash(curl:*)",
-      "Bash(gcloud:*)",
-      "Bash(kubectl:*)",
-      "WebFetch"
-    ],
     "deny": [
       "Bash(git push --force:*)",
       "Bash(git push:--force:*)",
@@ -97,6 +89,14 @@
       "Bash(gh workflow disable:*)",
       "Bash(gh workflow enable:*)",
       "Bash(gh workflow run:*)"
+    ],
+    "ask": [
+      "Bash(rm:*)",
+      "Bash(chmod:*)",
+      "Bash(curl:*)",
+      "Bash(gcloud:*)",
+      "Bash(kubectl:*)",
+      "WebFetch"
     ]
   },
   "statusLine": {
