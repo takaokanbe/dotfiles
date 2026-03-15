@@ -20,6 +20,9 @@ ln -sfn "$DOTFILES_DIR/config/nvim" ~/.config/nvim
 # IdeaVim
 ln -sf "$DOTFILES_DIR/config/ideavim/.ideavimrc" ~/.ideavimrc
 
+# tmux
+ln -sfn "$DOTFILES_DIR/config/tmux" ~/.config/tmux
+
 # Claude Code
 mkdir -p ~/.claude
 ln -sf "$DOTFILES_DIR/config/claude/settings.json" ~/.claude/settings.json
