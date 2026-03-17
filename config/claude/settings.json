@@ -38,6 +38,7 @@
       "Bash(git fetch:*)",
       "Bash(git show:*)",
       "Bash(gh pr:*)",
+      "Bash(gh run view:*)",
       "WebFetch(domain:developer.hashicorp.com)",
       "WebFetch(domain:cloud.google.com)",
       "WebFetch(domain:docs.google.com)"
