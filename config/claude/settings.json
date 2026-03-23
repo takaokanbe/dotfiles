@@ -32,6 +32,7 @@
       "Bash(git pull:*)",
       "Bash(git branch:*)",
       "Bash(git checkout:*)",
+      "Bash(git switch -c:*)",
       "Bash(git log:*)",
       "Bash(git ls-tree:*)",
       "Bash(git diff:*)",
