@@ -23,6 +23,9 @@ ln -sf "$DOTFILES_DIR/config/ideavim/.ideavimrc" ~/.ideavimrc
 # tmux
 ln -sfn "$DOTFILES_DIR/config/tmux" ~/.config/tmux
 
+# WezTerm
+ln -sfn "$DOTFILES_DIR/config/wezterm" ~/.config/wezterm
+
 # Claude Code
 mkdir -p ~/.claude
 ln -sf "$DOTFILES_DIR/config/claude/settings.json" ~/.claude/settings.json
