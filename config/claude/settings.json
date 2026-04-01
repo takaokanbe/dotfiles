@@ -140,7 +140,9 @@
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true,
     "okr-skills@okr-sounding-board": true,
-    "codex@openai-codex": true
+    "codex@openai-codex": true,
+    "code-simplifier@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "okr-sounding-board": {

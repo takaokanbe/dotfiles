@@ -15,45 +15,78 @@ disable-model-invocation: true
 
 ## 実行手順
 
-### 1. 事前チェック
+### 1. 状態の確認
 
-以下を確認する:
+以下を並列で実行し、現在の状態を把握する:
 
 ```bash
 git status
 git diff --stat
+git log --oneline -5
 ```
 
+確認すること:
+
 - コミット対象の変更があるか
-- 意図しないファイルが含まれていないか
+- 未追跡ファイルに機密情報が含まれていないか（次のステップで詳しくチェックする）
 
-問題があれば処理を中断し、ユーザーに報告する。
+変更がなければ「コミット対象の変更がありません。」と報告して終了する。
 
-### 2. 現在のブランチと PR 状態の確認
+### 2. 機密ファイルのチェック
+
+`git status` の出力に以下のパターンに一致するファイルがないか確認する:
+
+- `.env`, `.env.*`, `.env.local`
+- `credentials.json`, `service-account*.json`
+- `*.pem`, `*.key`, `*.p12`, `*.pfx`
+- `.secret`, `secrets.*`
+- `*_rsa`, `*_dsa`, `*_ed25519`
+
+該当ファイルが見つかった場合:
+
+1. ユーザーに警告する（ファイル名と除外する旨を明示）
+2. そのファイルは絶対にステージングしない
+3. `.gitignore` に含まれていない場合は追加を提案する（自動では変更しない）
+
+### 3. 現在のブランチと PR 状態の確認
 
 ```bash
 git branch --show-current
-gh pr list --head $(git branch --show-current) --state open --json number,title
 ```
 
-- 現在のブランチ名を取得
-- 同じブランチで Open の PR が存在するか確認
-
-### 3. ブランチ戦略の決定
-
-Open の PR が存在しない場合:
-
-- 現在のブランチでコミット・プッシュし、新規に PR を作成する
-
-Open の PR が存在する場合:
-
-- 現在のブランチのままコミット・プッシュし、既存 PR を更新する
+ベースブランチを特定する（`main` または `master`。両方存在する場合は `main` を優先）:
 
 ```bash
-git switch -c <新しいブランチ名>
+git rev-parse --verify main 2>/dev/null && echo main || echo master
 ```
 
-### 4. コミットメッセージの作成
+現在のブランチで Open の PR があるか確認する:
+
+```bash
+gh pr list --head "$(git branch --show-current)" --state open --json number,title,url
+```
+
+### 4. ブランチ戦略の決定
+
+**ケースA: 現在のブランチがベースブランチ（main/master）の場合**
+
+新しいブランチを作成する。ブランチ名は変更内容から `<type>/<短い説明>` の形式で命名する:
+
+```bash
+git switch -c <type>/<短い説明>
+```
+
+例: `feat/add-auth`, `fix/login-null-pointer`, `chore/update-settings`
+
+**ケースB: フィーチャーブランチにいて、Open の PR がない場合**
+
+現在のブランチのままコミット・プッシュし、新規に PR を作成する。
+
+**ケースC: フィーチャーブランチにいて、Open の PR がある場合**
+
+現在のブランチのままコミット・プッシュし、既存の PR を更新する。新規 PR は作成しない。
+
+### 5. コミットメッセージの作成
 
 変更内容を分析し、以下の形式でコミットメッセージを作成する:
 
@@ -89,56 +122,91 @@ subject のルール:
 - `fix: resolve null pointer exception in login`
 - `docs: update README with installation instructions`
 
-### 5. コミットの実行
+### 6. ステージングとコミット
+
+コミット対象のファイルを **個別に** ステージングする。`git add -A` や `git add .` は使わない:
 
 ```bash
-git add -A
+git add <ファイル1> <ファイル2> ...
+```
+
+ステージング後、含まれるファイルを確認する:
+
+```bash
+git diff --cached --name-only
+```
+
+意図しないファイルが含まれていないことを確認してからコミットする:
+
+```bash
 git commit -m "<type>: <subject>"
 ```
 
-### 6. PR 作成前のコミット確認
+### 7. PR 作成前のコミット確認
 
-ベースブランチ（main）との差分を確認:
+ベースブランチとの差分を確認する（ベースブランチ名はステップ 3 で特定したものを使用）:
 
 ```bash
-git log main..<現在のブランチ> --oneline
+git log <ベースブランチ>..<現在のブランチ> --oneline
 ```
 
-- 意図しないコミットが含まれていないか確認
-- 問題があればユーザーに報告し、処理を中断
+意図しないコミットが含まれている場合はユーザーに報告し、続行するか確認する。
 
-### 7. リモートへのプッシュ
+### 8. リモートへのプッシュ
 
 ```bash
 git push -u origin <ブランチ名>
 ```
 
-### 8. PR の作成
+### 9. PR の作成または更新、ブラウザで開く
 
-Open PR がない場合のみ PR を作成:
+**ケースA・B（新規 PR 作成）の場合:**
+
+PR を作成し、ブラウザで自動的に開く:
 
 ```bash
-gh pr create --title "<type>: <subject>" --body "<description>"
+gh pr create --web --title "<type>: <subject>" --body "<description>"
 ```
 
 PR タイトル:
 
 - コミットメッセージと同じ形式（`<type>: <subject>`）
-- バリデーションルールに従う（小文字で開始）
 
 PR description:
 
-- `.github/PULL_REQUEST_TEMPLATE.md` のテンプレートに従う
-- 各セクションを適切に埋める
+- `.github/PULL_REQUEST_TEMPLATE.md` が存在すればそのテンプレートに従う
+- 存在しなければ、変更の概要を簡潔に記述する
 
-### 9. PR 作成後の確認
+**ケースC（既存 PR 更新）の場合:**
+
+PR 作成はスキップし、既存の PR をブラウザで開く:
 
 ```bash
 gh pr view --web
 ```
 
-- PR が正しく作成されたことを確認
-- PR の URL をユーザーに報告
+### 10. 完了報告
+
+PR の URL をユーザーに報告する。URL は `gh pr view --json url -q .url` で取得できる。
+
+新規 PR の場合:
+
+```
+実行結果:
+- ブランチ: <ブランチ名>
+- コミット: <コミットメッセージ>
+- PR: <PR URL>
+- 含まれるコミット数: <数>
+```
+
+既存 PR 更新の場合:
+
+```
+既存の PR を更新しました:
+- ブランチ: <ブランチ名>
+- コミット: <コミットメッセージ>
+- PR: <PR URL>
+```
 
 ## エラーハンドリング
 
@@ -148,36 +216,16 @@ gh pr view --web
 コミット対象の変更がありません。
 ```
 
+プッシュが拒否された場合（権限エラー等）:
+
+```
+プッシュが拒否されました。ブランチ名やリモートの設定を確認してください。
+```
+
 バリデーションエラーが予想される場合:
 
 ```
 PR タイトルがバリデーションルールに違反する可能性があります:
 - subject は小文字で開始してください
 - 許可される type: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
-```
-
-意図しないコミットが含まれる場合:
-
-```
-以下のコミットが PR に含まれます。意図した変更か確認してください:
-<コミット一覧>
-
-続行しますか？
-```
-
-## 出力例
-
-```
-実行結果:
-- ブランチ: feat/add-new-feature
-- コミット: feat: add user authentication
-- PR: https://github.com/owner/repo/pull/123
-- 含まれるコミット数: 1
-```
-
-Open PR が存在する場合:
-
-```
-Open の PR が見つかったため、新規作成はせず既存 PR を更新します:
-- PR: <url>
 ```
