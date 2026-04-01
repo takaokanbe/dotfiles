@@ -101,22 +101,13 @@
       "WebFetch"
     ]
   },
-  "statusLine": {
-    "type": "command",
-    "command": "~/.claude/statusline.sh"
-  },
-  "enabledPlugins": {
-    "gopls-lsp@claude-plugins-official": true
-  },
-  "language": "japanese",
-  "alwaysThinkingEnabled": true,
   "hooks": {
     "Stop": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "terminal-notifier -title 'Claude Code' -message 'Task completed'"
+            "command": "WS=$(wezterm cli list --format json 2>/dev/null | jq -r --arg pane \"$WEZTERM_PANE\" '.[] | select(.pane_id == ($pane | tonumber)) | .workspace' 2>/dev/null || echo 'unknown'); terminal-notifier -title \"Claude Code [$WS]\" -message 'Task completed'"
           }
         ]
       }
@@ -127,7 +118,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "terminal-notifier -title 'Claude Code' -message 'Approval needed'"
+            "command": "WS=$(wezterm cli list --format json 2>/dev/null | jq -r --arg pane \"$WEZTERM_PANE\" '.[] | select(.pane_id == ($pane | tonumber)) | .workspace' 2>/dev/null || echo 'unknown'); terminal-notifier -title \"Claude Code [$WS]\" -message 'Approval needed'"
           }
         ]
       },
@@ -136,10 +127,35 @@
         "hooks": [
           {
             "type": "command",
-            "command": "terminal-notifier -title 'Claude Code' -message 'Input needed'"
+            "command": "WS=$(wezterm cli list --format json 2>/dev/null | jq -r --arg pane \"$WEZTERM_PANE\" '.[] | select(.pane_id == ($pane | tonumber)) | .workspace' 2>/dev/null || echo 'unknown'); terminal-notifier -title \"Claude Code [$WS]\" -message 'Input needed'"
           }
         ]
       }
     ]
-  }
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh"
+  },
+  "enabledPlugins": {
+    "gopls-lsp@claude-plugins-official": true,
+    "okr-skills@okr-sounding-board": true,
+    "codex@openai-codex": true
+  },
+  "extraKnownMarketplaces": {
+    "okr-sounding-board": {
+      "source": {
+        "source": "github",
+        "repo": "fantech-studio/okr-sounding-board"
+      }
+    },
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
+      }
+    }
+  },
+  "language": "japanese",
+  "alwaysThinkingEnabled": true
 }
