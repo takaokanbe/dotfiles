@@ -162,10 +162,11 @@ git push -u origin <ブランチ名>
 
 **ケースA・B（新規 PR 作成）の場合:**
 
-PR を作成し、ブラウザで自動的に開く:
+PR を作成し、その後ブラウザで開く:
 
 ```bash
-gh pr create --web --title "<type>: <subject>" --body "<description>"
+gh pr create --title "<type>: <subject>" --body "<description>"
+gh pr view --web
 ```
 
 PR タイトル:
