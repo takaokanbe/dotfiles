@@ -6,11 +6,14 @@
 
 ```
 config/
+  claude/      # Claude Code
   ghostty/     # Ghostty
   git/         # Git
   ideavim/     # IdeaVim
   nvim/        # Neovim
   starship/    # Starship
+  tmux/        # tmux
+  wezterm/     # WezTerm
 scripts/
   link.sh        # シンボリックリンクを作成
   true-color.sh  # True Colorの表示テスト
@@ -33,3 +36,8 @@ scripts/
 | `config/ghostty/` | `~/.config/ghostty` |
 | `config/nvim/` | `~/.config/nvim` |
 | `config/ideavim/.ideavimrc` | `~/.ideavimrc` |
+| `config/tmux/` | `~/.config/tmux` |
+| `config/wezterm/` | `~/.config/wezterm` |
+| `config/claude/settings.json` | `~/.claude/settings.json` |
+| `config/claude/statusline.sh` | `~/.claude/statusline.sh` |
+| `config/claude/skills/` | `~/.claude/skills` |
