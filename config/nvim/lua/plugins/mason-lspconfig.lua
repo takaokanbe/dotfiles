@@ -40,6 +40,7 @@ return {
       callback = function(event)
         local buf = event.buf
         local client = vim.lsp.get_client_by_id(event.data.client_id)
+
         local telescope = require("telescope.builtin")
         local map = function(mode, lhs, rhs, desc)
           vim.keymap.set(mode, lhs, rhs, { buffer = buf, desc = desc })
