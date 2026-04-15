@@ -1,0 +1,23 @@
+{
+  "skill_name": "gen-agents-md",
+  "evals": [
+    {
+      "id": 0,
+      "name": "new-go",
+      "prompt": "このリポジトリ用に AGENTS.md を作って。Go で書かれた小さな HTTP サーバーで、まだエージェント向けのドキュメントは無い。ポインタ設計のベストプラクティスに従って、一次情報への参照中心の構成にしてほしい。できれば 50 行以内に収めて。",
+      "expected_output": "AGENTS.md が新規作成される（≤50 行、ポインタ形式、`Makefile`/`openapi/api.yml`/`migrations/*.sql`/`.golangci.yml` への参照を含む）。CLAUDE.md が AGENTS.md への symlink として作成される。"
+    },
+    {
+      "id": 1,
+      "name": "migration-node",
+      "prompt": "CLAUDE.md を更新したい。見てもらうとわかるけど、説明文だらけで腐敗しそう。ポインタ設計に書き直して、あわせて AGENTS.md 中心の構成に移行してほしい。",
+      "expected_output": "既存の CLAUDE.md（約 45 行、descriptive）が AGENTS.md にリネームされ、内容がポインタ形式に全面リライトされる。AGENTS.md は ≤50 行。CLAUDE.md は AGENTS.md への symlink。`package.json`/`prisma/schema.prisma`/`openapi.yaml`/`.eslintrc.json` への参照を含む。既存の Conventional Commits 規約は保持される。"
+    },
+    {
+      "id": 2,
+      "name": "update-python",
+      "prompt": "AGENTS.md に「型ヒント必須」の規約と、テストは pytest の fixture で DB を testcontainers で立ち上げる旨を追加しておいて。",
+      "expected_output": "既存の AGENTS.md（実体ファイル）に 2 つの規約が追加される。CLAUDE.md は既存の symlink のまま（変更されない）。行数は ≤50 行。既存のポインタ（`pyproject.toml`/`alembic/versions/*.py`/`ruff.toml`）は保持される。"
+    }
+  ]
+}
