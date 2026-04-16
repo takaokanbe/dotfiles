@@ -1,0 +1,54 @@
+{
+  "skill_name": "address-pr-review",
+  "evals": [
+    {
+      "id": 1,
+      "name": "dry-run-small-pr",
+      "prompt": "現在のブランチの PR に対して address-pr-review skill を実行して。--max-iterations 2 で。typo 修正と意図的な style violation が混ざった小さい PR を想定。",
+      "expected_output": "並列レビュー（最大4 slot）が走り、FP scoring が finding を絞り込み、4段階トリアージが提示され、--no-confirm 無しなら AskUserQuestion で閾値確認が入り、修正後にローカル tests が実走され、low の finding が閾値外でスキップされ、Bot 用コメントが付くこと",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "blocked-finding-after-3-retries",
+      "prompt": "外部依存が絡む mock エラーを含む PR で address-pr-review --max-iterations 1 を実行して。修正不能な finding が 3 回リトライ後に blocked マークされて最終レポートに残ることを確認したい。",
+      "expected_output": "修正サブループ（ステップ 6 の 3 回リトライ）が機能し、blocked マークが付与され、最終レポートに『対応失敗（ブロッカー）』として残ること",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "threshold-critical-skips-others",
+      "prompt": "address-pr-review --threshold critical --no-confirm で実行して。high / medium / low の finding が一切修正対象に入らないこと、レポートで『閾値外』として明示されることを確認したい。",
+      "expected_output": "対応 severity が {critical} のみになり、high 以下の finding は『意図的スキップ』に分類され、--no-confirm によりユーザー確認画面はスキップされる",
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "iteration-cap-stops-loop",
+      "prompt": "address-pr-review --max-iterations 1 で実行して。1 反復後にループが必ず停止し、2 反復目に入らないことを確認したい。",
+      "expected_output": "n=1 の時点でステップ 8 の停止条件 (n >= max-iterations) が発動し、ステップ 9・10 にそのまま進む",
+      "files": []
+    },
+    {
+      "id": 5,
+      "name": "session-context-demotes-finding",
+      "prompt": "セッション内で『auth/session.ts のトークン更新 race は今回 scope 外、別 PR で対応』と先に合意した状態で address-pr-review を実行して。当該 finding が critical → low に降格され session_status: deferred が付き、根拠が表示されること、ただし最低 high レベルまで（adversarial-review 由来なら）の安全装置が効くことを確認したい。",
+      "expected_output": "ステップ 4.5 のセッション pre-triage が動作し、降格根拠が `session_reasoning` に記録され、ステップ 5 のユーザー確認で『なぜ降格したか』が提示される",
+      "files": []
+    },
+    {
+      "id": 6,
+      "name": "ci-failure-subloop-recovers",
+      "prompt": "ステップ 7.5 で push 後に CI（テスト 1 件）が失敗するシナリオで address-pr-review を実行して。ステップ 7.6 の CI 修正サブループが動き、ログ取得→修正→再 push→CI green まで自律的に進むこと、ステップ 8 には CI green 後にしか進まないことを確認したい。",
+      "expected_output": "gh pr checks --watch で CI 完走を待ち、red を検出して `gh run view --log-failed` でログ取得、修正コミット (`fix(ci): ...`) を作って再 push、再 watch で green を確認後にステップ 8 へ進む。`--ci-max-retries 3` 上限で stuck を防ぐ",
+      "files": []
+    },
+    {
+      "id": 7,
+      "name": "adversarial-auto-trigger-on-auth-change",
+      "prompt": "auth/session.ts を変更した PR で address-pr-review を実行して。`--adversarial auto`（デフォルト）がキーワード検出して `/codex:adversarial-review` を slot A' で並走させること、両方で指摘された finding に +20 confidence ボーナスが乗ることを確認したい。",
+      "expected_output": "ステップ 2-1 のキーワード判定 (auth) で A' が起動し、ステップ 3-2 のクロス検証ボーナスが適用される",
+      "files": []
+    }
+  ]
+}
