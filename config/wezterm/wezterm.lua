@@ -76,15 +76,9 @@ config.window_frame = {
 	border_bottom_color = "#585b70",
 	border_top_color = "#585b70",
 }
-config.hide_tab_bar_if_only_one_tab = false
-config.use_fancy_tab_bar = false
-config.show_new_tab_button_in_tab_bar = false
-config.tab_max_width = 40
+config.enable_tab_bar = false
 config.colors = {
 	split = "#585b70",
-	tab_bar = {
-		background = "#1e1e2e",
-	},
 }
 
 -- Cursor
@@ -491,71 +485,6 @@ config.keys = {
 	-- Copy mode
 	{ key = "[", mods = "LEADER", action = act.ActivateCopyMode },
 }
-
--- Catppuccin Mocha colors for tabs
-local tab_colors = {
-	bg = "#1e1e2e",
-	active_bg = "#cba6f7",
-	active_fg = "#1e1e2e",
-	inactive_bg = "#313244",
-	inactive_fg = "#cdd6f4",
-}
-
--- Tab title: powerline style with zoom/pane indicators
-local SOLID_RIGHT_ARROW = utf8.char(0xe0b0)
-
-wezterm.on("format-tab-title", function(tab, tabs)
-	local title = tab.active_pane.title
-	local prefix = ""
-
-	-- Use cwd basename as tab name (fallback to process title)
-	local cwd = tab.active_pane.current_working_dir
-	local tab_name = title
-	if cwd then
-		local path = type(cwd) == "userdata" and cwd.file_path or tostring(cwd)
-		-- Remove trailing slash then extract basename
-		path = string.gsub(path, "[/\\]$", "")
-		local basename = string.match(path, "([^/\\]+)$")
-		if basename and basename ~= "" then
-			tab_name = basename
-		end
-	end
-	local content = (tab.tab_index + 1) .. ": " .. prefix .. tab_name
-	local max = (config.tab_max_width or 12) - 2
-	if #content > max then
-		content = content:sub(1, max - 1) .. "…"
-	end
-
-	local bg = tab.is_active and tab_colors.active_bg or tab_colors.inactive_bg
-	local fg = tab.is_active and tab_colors.active_fg or tab_colors.inactive_fg
-
-	-- Determine the background color after this tab for the arrow
-	local next_bg = tab_colors.bg
-	local next_tab = tabs[tab.tab_index + 2]
-	if next_tab then
-		next_bg = next_tab.is_active and tab_colors.active_bg or tab_colors.inactive_bg
-	end
-
-	return wezterm.format({
-		{ Background = { Color = bg } },
-		{ Foreground = { Color = fg } },
-		{ Text = " " .. content .. " " },
-		{ Background = { Color = next_bg } },
-		{ Foreground = { Color = bg } },
-		{ Text = SOLID_RIGHT_ARROW },
-	})
-end)
-
--- Right status: workspace name (matching active tab style)
-wezterm.on("update-status", function(window)
-	local workspace = window:active_workspace()
-	local base_path = string.gsub(workspace, "(.*[/\\])(.*)", "%2")
-	window:set_right_status(wezterm.format({
-		{ Background = { Color = "#cba6f7" } },
-		{ Foreground = { Color = "#1e1e2e" } },
-		{ Text = "  " .. base_path .. "  " },
-	}))
-end)
 
 -- Auto-equalize panes on window resize (e.g. display move)
 wezterm.on("window-resized", function(window)
