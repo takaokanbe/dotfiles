@@ -14,9 +14,15 @@ CURRENT_DIR=$(echo "$input" | jq -r '.workspace.current_dir')
 CONTEXT_SIZE=$(echo "$input" | jq -r '.context_window.context_window_size')
 USAGE=$(echo "$input" | jq '.context_window.current_usage')
 
-# Git branch (purple)
+# Repo name (cyan, falls back to basename of current dir) + Git branch (purple)
+REPO_NAME="${CURRENT_DIR##*/}"
 GIT_BRANCH=""
 if git rev-parse --git-dir > /dev/null 2>&1; then
+    # --git-common-dir resolves to the main repo's .git even inside a worktree
+    GIT_COMMON_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null)
+    if [ -n "$GIT_COMMON_DIR" ]; then
+        REPO_NAME=$(basename "$(dirname "$GIT_COMMON_DIR")")
+    fi
     BRANCH=$(git branch --show-current 2>/dev/null)
     if [ -n "$BRANCH" ]; then
         GIT_BRANCH=" ${PURPLE} ${BRANCH}${RESET}"
@@ -39,5 +45,5 @@ else
     CONTEXT=" ${GREEN}0%${RESET}"
 fi
 
-# Model (bold), Directory (cyan), Git branch (purple), Context usage
-echo "${BOLD}${MODEL}${RESET} ${CYAN}${CURRENT_DIR##*/}${RESET}${GIT_BRANCH}${CONTEXT}"
+# Model (bold), Repo (cyan), Git branch (purple), Context usage
+echo "${BOLD}${MODEL}${RESET} ${CYAN}${REPO_NAME}${RESET}${GIT_BRANCH}${CONTEXT}"
