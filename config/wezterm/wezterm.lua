@@ -52,7 +52,10 @@ end
 config.color_scheme = "Catppuccin Mocha"
 
 -- Font
-config.font = wezterm.font("FiraMono Nerd Font Mono")
+config.font = wezterm.font_with_fallback({
+	"FiraMono Nerd Font Mono",
+	"HackGen Console NF",
+})
 config.font_size = 15
 config.harfbuzz_features = { "calt=0", "liga=0", "dlig=0" }
 
