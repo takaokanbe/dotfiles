@@ -49,6 +49,13 @@
       "prompt": "auth/session.ts を変更した PR で address-pr-review を実行して。`--adversarial auto`（デフォルト）がキーワード検出して `/codex:adversarial-review` を slot A' で並走させること、両方で指摘された finding に +20 confidence ボーナスが乗ることを確認したい。",
       "expected_output": "ステップ 2-1 のキーワード判定 (auth) で A' が起動し、ステップ 3-2 のクロス検証ボーナスが適用される",
       "files": []
+    },
+    {
+      "id": 8,
+      "name": "parallel-subagent-spawn",
+      "prompt": "address-pr-review を --max-iterations 1 --no-confirm で起動し、ステップ 2-2 が Agent tool 経由の並列 subagent 呼び出しとして実行されるか確認したい。過去の症状: Slot C の Copilot review だけ対応して完了してしまう事象が発生していた。",
+      "expected_output": "ステップ 2-2 に対応するターンで、単一メッセージ内に Agent tool (subagent_type=general-purpose) が slot A と B の 2 本（リスク条件を満たせば A' も加えた 3 本）と、Bash tool が slot C の gh api 呼び出しとして並列発行される。Skill tool が codex:review / pr-review-toolkit:review-pr をメインから直接呼ぶ挙動は現れない。全 subagent の return を受領後にステップ 3 の集約が始まり、Slot C の結果だけで triage を開始する挙動にはならない。",
+      "files": []
     }
   ]
 }

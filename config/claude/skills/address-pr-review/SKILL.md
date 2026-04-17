@@ -1,6 +1,6 @@
 ---
 name: address-pr-review
-description: 現在のブランチの PR に対してレビュー生成・既存 PR コメント取込・優先度トリアージ・修正・CI 監視・ループ実行を行うオーケストレーションスキル。`/codex:review`、`/codex:adversarial-review`、`/pr-review-toolkit:review-pr`、`gh` を組み合わせ、critical/high/medium/low の severity で対応範囲を制御する。
+description: 現在のブランチの PR に対してレビュー生成・既存 PR コメント取込・優先度トリアージ・修正・CI 監視・ループ実行を、**並列 subagent + メイン集約 triage** で行うオーケストレーションスキル。`/codex:review`、`/codex:adversarial-review`、`/pr-review-toolkit:review-pr`、`gh` を Agent tool で並列起動し、全 finding 集約後に critical/high/medium/low の severity で対応範囲を制御する。
 disable-model-invocation: true
 ---
 
@@ -8,6 +8,25 @@ disable-model-invocation: true
 
 現在のブランチの Open PR に対して、新規レビュー生成・既存 PR コメント取込・優先度トリアージ・修正・CI 監視を反復実行する。
 **FP 検証 + 閾値停止 + 実走検証 + 人間チェックポイント** を組み込み、infinite loop / validation hallucination / コスト暴走を避ける設計。
+
+## 実行フェーズ（時系列）
+
+本 skill は 1 反復につき以下 5 フェーズを順に進める。**各フェーズ境界は明確に保ち、前フェーズが完了するまで次フェーズに進まない**。これは早期コミットや部分 triage による「PR の Copilot review だけ対応して完了した」ような症状を防ぐための不変条件。
+
+| Phase | 内容 | 対応ステップ | 並列性 |
+| --- | --- | --- | --- |
+| **A. 並列レビュー** | 全レビュー系 slot を subagent で同時起動し、全 return を待つ | 2 | 並列 |
+| **B. 集約 + triage** | 正規化 → FP scoring → severity 分類 → セッション文脈反映 → ユーザー確認 | 3–5 | 一部並列 (FP scoring) |
+| **C. 逐次修正** | severity 順に 1 件ずつ修正 → 実走検証 → resolve/blocked マーク | 6–7 | 直列 |
+| **D. コミット + CI 監視** | iteration 単位でまとめて commit/push → CI green まで修正サブループ | 7.5–7.6 | 直列 |
+| **E. 再レビュー or 終了** | iteration カウンタ更新 → 停止条件判定 → bot 再レビュー依頼 → 最終レポート | 8–10 | 直列 |
+
+Phase 境界の不変条件：
+
+- **A→B**：Agent 呼び出しの全 return を受領してから集約を始める。**途中結果で triage に進まない**
+- **B→C**：ユーザー確認が完了するまで Edit / Write を実行しない
+- **C→D**：その反復で resolve した finding が 0 件ならコミット自体スキップ
+- **D→E**：CI green 確認前にステップ 8 の再レビュー判定に進まない
 
 ## 前提条件
 
@@ -79,24 +98,67 @@ LOC=$(git diff --shortstat "$(git merge-base origin/<base> HEAD)"...HEAD | awk '
 [ "${LOC:-0}" -gt 500 ] && ADVERSARIAL=1
 ```
 
-#### 2-2. 並列実行
+#### 2-2. 並列実行（単一メッセージで Agent + Bash を発行）
 
-Agent tool で **最大 4 並列** 実行：
+**原則**：
 
-| 並列 slot | 担当 | 呼出し | 強み |
-| --- | --- | --- | --- |
-| A | `/codex:review --wait` で実装レベルのレビュー | Skill tool で `codex:review` | バグ・実装欠陥の検出 |
-| A'（条件付） | `/codex:adversarial-review --wait [--focus "..."]` で設計・前提への挑戦 | Skill tool で `codex:adversarial-review` | 認証・データ損失・競合・rollback 等の高リスク領域 |
-| B | `/pr-review-toolkit:review-pr all` で観点別レビュー | Skill tool で `pr-review-toolkit:review-pr` | セキュリティ / テスト / 型 / 静黙失敗の観点網羅 |
-| C | 既存 PR review comments + issue comments を取得 | `gh api repos/:owner/:repo/pulls/<N>/comments` と `gh pr view --comments` | 人間 / bot の実レビューコメント |
+- メインエージェントは **単一メッセージで複数の Agent tool 呼び出し**（slot A / A' / B）と **Bash tool 呼び出し**（slot C）を同時発行する。これにより 4 系統のレビューが真に並列実行される
+- **Skill tool をメインから直接呼んではならない**。Skill tool はメインコンテキストで同期実行されるため、1 メッセージ内複数呼び出しは逐次化し、並列にならない。レビュー skill の起動は必ず subagent 内部から行う
+- 全 Agent 呼び出しの return を受領するまで、メインは次フェーズ（B: 集約・triage）に進まない。Slot C だけ先に返っても triage を開始しない
 
-slot C のコマンド例：
+**Slot 表**：
+
+| 並列 slot | 担当 | メインからの呼出し | subagent 内部で実行する命令 | 強み |
+| --- | --- | --- | --- | --- |
+| A | 実装レベルのレビュー | `Agent(subagent_type="general-purpose", …)` | Skill tool で `codex:review --wait` | バグ・実装欠陥の検出 |
+| A'（条件付） | 設計・前提への挑戦 | `Agent(subagent_type="general-purpose", …)` | Skill tool で `codex:adversarial-review --wait [--focus "..."]` | 認証・データ損失・競合・rollback 等の高リスク領域 |
+| B | 観点別レビュー | `Agent(subagent_type="general-purpose", …)` | Skill tool で `pr-review-toolkit:review-pr all` | セキュリティ / テスト / 型 / 静黙失敗の観点網羅 |
+| C | 既存 PR review comments + issue comments を取得 | `Bash(command="gh api …")`（subagent 不要、単一ターン完結） | — | 人間 / bot の実レビューコメント |
+
+**各 subagent のプロンプト共通形式**：
+
+subagent には以下を明示的に渡す：
+
+1. どの slash command を呼ぶか（例: `/codex:review --wait`）と、その引数
+2. 呼んだ結果を **ステップ 2-3 の JSON schema に正規化して返す** こと
+3. 正規化できない情報は `raw_output` キーに raw テキストとして添付すること
+4. `source` フィールドに slot 識別子（`"codex"` / `"codex-adversarial"` / `"pr-review-toolkit"`）を埋めること
+5. **修正の提案・実施は禁止**（それは本 skill の Phase C で行う）
+
+Slot A のプロンプト骨子（例）：
+
+```
+あなたは本 PR のコードレビュー subagent。
+1. Skill tool で codex:review --wait を呼び、結果テキストを受け取る
+2. findings 配列として返却せよ:
+   [{ "id": "...", "source": "codex", "file": "...", "line": ...,
+      "raw_severity": "...", "message": "...", "suggested_fix": "...",
+      "codex_confidence": null, "raw_output": "<raw text>" }]
+3. 抽出できないフィールドは null を入れる
+4. codex:review はテキスト出力であり JSON を返さない。confidence は null で OK
+5. 修正・Edit・Write は一切行わない
+```
+
+Slot A' のプロンプトは `codex:adversarial-review --wait` を呼ぶ点と、こちらは JSON (`approve` / `needs-attention` + 0.0–1.0 confidence + file:line) が返るので `codex_confidence` に値を詰める点が異なる。
+
+**Slot C の bash コマンド**（同一メッセージ内で Bash tool として発行）：
 
 ```bash
 gh api "repos/${OWNER}/${REPO}/pulls/${PR}/comments" --paginate
 gh api "repos/${OWNER}/${REPO}/issues/${PR}/comments" --paginate
 gh api "repos/${OWNER}/${REPO}/pulls/${PR}/reviews" --paginate
 ```
+
+**発行イメージ**（メインから単一メッセージで）：
+
+```
+[Agent tool]       slot A  → codex:review
+[Agent tool]       slot A' → codex:adversarial-review  (条件を満たすときのみ)
+[Agent tool]       slot B  → pr-review-toolkit:review-pr all
+[Bash tool x3]     slot C  → gh api pulls/issues/reviews
+```
+
+Claude Code の harness は複数 tool 呼び出しを並列実行し、全 return を集めて一度に tool_result を返す。メインは次ターンで全 slot の結果を受け取り、ステップ 2-3 の正規化に進む。
 
 #### 2-3. findings の正規化
 
@@ -111,8 +173,9 @@ gh api "repos/${OWNER}/${REPO}/pulls/${PR}/reviews" --paginate
   "raw_severity": "<string>",
   "message": "<text>",
   "suggested_fix": "<text or null>",
-  "thread_id": "<string or null>",     // gh の resolvable thread 用
-  "codex_confidence": "<0.0-1.0 or null>" // codex(-adversarial) 由来なら格納
+  "thread_id": "<string or null>",      // gh の resolvable thread 用
+  "codex_confidence": "<0.0-1.0 or null>", // codex-adversarial のみ値あり。codex:review はテキスト出力なので null
+  "raw_output": "<text or null>"        // 正規化できなかった raw レスポンスの保全
 }
 ```
 
@@ -120,7 +183,9 @@ gh api "repos/${OWNER}/${REPO}/pulls/${PR}/reviews" --paginate
 
 #### 3-1. 個別 confidence scoring
 
-各 finding を独立な subagent（Agent tool、`subagent_type=general-purpose`）で 0–100 の confidence scoring。
+各 finding に対し **独立な Agent tool 呼び出しを単一メッセージでまとめて発行** して 0–100 の confidence scoring を並列実施する（`subagent_type=general-purpose`）。
+findings が 20 件を超える場合は 20 件ずつバッチ並列化（1 メッセージあたり最大 20 Agent 呼び出し）。
+
 ルブリックは `/code-review:code-review` の既存ルブリック（0/25/50/75/100）を流用：
 
 - **0**: 明らかな FP / 既存問題
@@ -130,7 +195,7 @@ gh api "repos/${OWNER}/${REPO}/pulls/${PR}/reviews" --paginate
 - **100**: 確実
 
 評価 prompt には CLAUDE.md / REVIEW.md（存在すれば）をコンテキストとして渡す。
-codex(-adversarial) 由来の finding は `codex_confidence * 100` を初期値として採用し、scoring agent が調整。
+**`codex_confidence` が入っているのは `source: codex-adversarial` のみ**（`codex:review` はテキスト出力のため null）。adversarial 由来の finding は `codex_confidence * 100` を初期値として採用し、scoring agent が調整する。
 
 #### 3-2. クロス検証ボーナス
 
@@ -237,6 +302,11 @@ Triage 結果（セッション文脈反映後）：
 `session_status: dismissed` の finding は最終レポートに残すが、対応対象には含めない。
 
 ### 6. 修正フェーズ
+
+**前提条件（Phase C の不変条件）**：
+
+- ステップ 5 のユーザー確認（または `--no-confirm` 時は閾値適用）が完了している
+- **triage 完了前に Edit / Write を実行してはならない**。ステップ 2〜5 の間にコード修正を始めると、後続 finding と衝突して差分が汚染される
 
 対象 severity の findings を **1 件ずつ逐次** 処理：
 
