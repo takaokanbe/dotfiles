@@ -46,15 +46,15 @@
     {
       "id": 7,
       "name": "adversarial-auto-trigger-on-auth-change",
-      "prompt": "auth/session.ts を変更した PR で address-pr-review を実行して。`--adversarial auto`（デフォルト）がキーワード検出して `/codex:adversarial-review` を slot A' で並走させること、両方で指摘された finding に +20 confidence ボーナスが乗ることを確認したい。",
-      "expected_output": "ステップ 2-1 のキーワード判定 (auth) で A' が起動し、ステップ 3-2 のクロス検証ボーナスが適用される",
+      "prompt": "auth/session.ts を変更した PR で address-pr-review を実行して。`--adversarial auto`（デフォルト）が auth キーワードを検出して A (codex:review) ではなく A' (codex:adversarial-review) を選択すること、Phase A で走るレビュー系 slot は A' 1 本のみで A は起動しないこと（排他）、A' と B の一致で +20 ボーナスが乗ることを確認したい。",
+      "expected_output": "ステップ 2-1 のキーワード判定 (auth) で A' が選択され、Phase A の発行 slot は A' + B + C の 3 本 (A は発行されない)、ステップ 3-2 のクロス検証ボーナスは A|A' と B の一致を対象に適用される",
       "files": []
     },
     {
       "id": 8,
       "name": "parallel-subagent-spawn",
-      "prompt": "address-pr-review を --max-iterations 1 --no-confirm で起動し、ステップ 2-2 が Agent tool 経由の並列 subagent 呼び出しとして実行されるか確認したい。過去の症状: Slot C の Copilot review だけ対応して完了してしまう事象が発生していた。",
-      "expected_output": "ステップ 2-2 に対応するターンで、単一メッセージ内に Agent tool (subagent_type=general-purpose) が slot A と B の 2 本（リスク条件を満たせば A' も加えた 3 本）と、Bash tool が slot C の gh api 呼び出しとして並列発行される。Skill tool が codex:review / pr-review-toolkit:review-pr をメインから直接呼ぶ挙動は現れない。全 subagent の return を受領後にステップ 3 の集約が始まり、Slot C の結果だけで triage を開始する挙動にはならない。",
+      "prompt": "address-pr-review を --max-iterations 1 --no-confirm で起動し、ステップ 2-2 が Agent tool 経由の並列 subagent 呼び出しとして実行されるか確認したい。過去の症状: slot C (Copilot review) だけ対応して完了する / slot A が発行されずスキップされる事象が発生していた。",
+      "expected_output": "ステップ 2-2 に対応するターンで、Pre-flight チェックリストが main の発話として出力され、その直後の単一メッセージ内に Agent tool (subagent_type=general-purpose) がレビュー系 1 本 (A か A' のどちらか — 排他で必ず片方) と B の 1 本、計 Agent × 2 と、Bash tool が slot C の gh api 呼び出しとして 3 本、合計 3 系統が並列発行される。A と A' の両方が同時に発行される挙動にはならない (4 並列にならない)。Skill tool が codex:review / pr-review-toolkit:review-pr をメインから直接呼ぶ挙動は現れない。ステップ 2-3 冒頭の return 検証で source ユニーク数 3 を確認し、全 return 受領後にステップ 3 の集約が始まる。slot C の結果だけで triage を開始する挙動にはならない。",
       "files": []
     }
   ]
