@@ -119,7 +119,8 @@
       "Bash(gcloud:*)",
       "Bash(kubectl:*)",
       "WebFetch"
-    ]
+    ],
+    "defaultMode": "plan"
   },
   "hooks": {
     "Stop": [
