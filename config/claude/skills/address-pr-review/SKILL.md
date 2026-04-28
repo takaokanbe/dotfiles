@@ -9,6 +9,28 @@ disable-model-invocation: true
 現在のブランチの Open PR に対して、新規レビュー生成・既存 PR コメント取込・優先度トリアージ・修正・CI 監視を反復実行する。
 **FP 検証 + 閾値停止 + 実走検証 + 人間チェックポイント** を組み込み、infinite loop / validation hallucination / コスト暴走を避ける設計。
 
+## Execution Contract
+
+本 skill が守るべき不変条件のサマリ。違反は実行中断条件。詳細は各実行手順を参照。
+
+### MUST（必ず守る）
+
+- **Phase A の 3 slot 並列発行**：レビュー系 1 本（A or A'）+ B + C を **単一メッセージで並列発行** する（ステップ 2-2）
+- **Phase 境界の遵守**：A→B→C→D→E の順序を厳守し、前フェーズ完了前に次に進まない
+- **Triage 完了前の Edit/Write 禁止**：ステップ 5 のユーザー確認（または `--no-confirm` 適用）後にのみ修正を開始（ステップ 6 不変条件）
+- **CI green 確認後にのみ再レビューへ**：ステップ 7.6 で CI watch 完了前にステップ 8 に進まない
+- **人間レビュアーの指摘 (`pr-comment-human`) は降格しない**：セッション文脈での降格対象外（ステップ 4.5-3）
+- **per-iteration push**：per-finding push と end-only push の両方を避ける（ステップ 7.5）
+
+### FORBIDDEN（絶対にやらない）
+
+- **途中結果での triage 開始**：3 slot 揃う前の集約は禁止
+- **Skill tool をメインから直接呼ぶ**：レビュー skill は必ず subagent 内部から起動する（並列性確保のため、ステップ 2-2）
+- **実走検証なしの `resolved` マーク**：ステップ 7 のローカル実走で通過してはじめて resolved
+- **自動 merge**：人間 approve は本 skill の責務外
+- **`git push --force` / `--no-verify`**：別 skill (`commit-push`) の規約に従い禁止
+- **降格 2 段階超えの severity 操作**：critical → low の一気降格は禁止（ステップ 4.5-3）
+
 ## 実行フェーズ（時系列）
 
 本 skill は 1 反復につき以下 5 フェーズを順に進める。**各フェーズ境界は明確に保ち、前フェーズが完了するまで次フェーズに進まない**。これは早期コミットや部分 triage による「PR の Copilot review だけ対応して完了した」ような症状を防ぐための不変条件。

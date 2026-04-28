@@ -7,6 +7,26 @@ disable-model-invocation: true
 
 変更をコミットし、GitHub に PR を作成する。
 
+## Execution Contract
+
+本 skill が守るべき不変条件。違反は実行中断条件。
+
+### MUST（必ず守る）
+
+- **`git add` は個別ファイル指定**：ファイル名を明示してステージングする（ステップ 6）
+- **機密ファイルの事前検出と除外**：`.env`, `*.key`, `*.pem`, `credentials.*`, `*_rsa`, `*_ed25519` などはステージング前に検出してユーザーに警告し、絶対にコミットしない（ステップ 2）
+- **Conventional Commits 準拠の subject**：小文字開始、許可された type のみ使用、末尾ピリオドなし（ステップ 5）
+- **既存 Open PR がある場合は新規作成せず、既存を更新**：同一ブランチに複数 PR を作らない（ステップ 4 ケース C）
+- **PR 作成後は URL をユーザーに報告**（ステップ 10）
+
+### FORBIDDEN（絶対にやらない）
+
+- **`git add -A` / `git add .`**：機密ファイルや無関係な変更の混入リスクが高い
+- **機密ファイルのコミット**：警告だけで進めるのは不可、必ず除外する
+- **大文字始まりの subject**：commitlint 等のバリデーション違反となる
+- **`--no-verify` での hook スキップ**：明示指示がない限り pre-commit hook を迂回しない
+- **`git push --force` / `--force-with-lease`**：global deny 設定、明示指示がない限り絶対実行しない
+
 ## 前提条件
 
 - git リポジトリ内で実行すること
