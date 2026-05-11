@@ -122,6 +122,11 @@
     ],
     "defaultMode": "plan"
   },
+  "sandbox": {
+    "network": {
+      "allowedDomains": ["api.github.com"]
+    }
+  },
   "hooks": {
     "Stop": [
       {
@@ -182,5 +187,6 @@
     }
   },
   "language": "japanese",
-  "alwaysThinkingEnabled": true
+  "alwaysThinkingEnabled": true,
+  "skipAutoPermissionPrompt": true
 }
