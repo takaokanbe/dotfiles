@@ -125,7 +125,8 @@
   "sandbox": {
     "network": {
       "allowedDomains": ["api.github.com"]
-    }
+    },
+    "excludedCommands": ["gh *"]
   },
   "hooks": {
     "Stop": [
