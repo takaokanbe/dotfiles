@@ -26,6 +26,10 @@ ln -sfn "$DOTFILES_DIR/config/tmux" ~/.config/tmux
 # WezTerm
 ln -sfn "$DOTFILES_DIR/config/wezterm" ~/.config/wezterm
 
+# Sheldon
+mkdir -p ~/.config/sheldon
+ln -sf "$DOTFILES_DIR/config/sheldon/plugins.toml" ~/.config/sheldon/plugins.toml
+
 # Claude Code
 mkdir -p ~/.claude
 ln -sf "$DOTFILES_DIR/config/claude/settings.json" ~/.claude/settings.json

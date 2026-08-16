@@ -11,6 +11,7 @@ config/
   git/         # Git
   ideavim/     # IdeaVim
   nvim/        # Neovim
+  sheldon/     # Sheldon
   starship/    # Starship
   tmux/        # tmux
   wezterm/     # WezTerm
@@ -38,6 +39,7 @@ scripts/
 | `config/ideavim/.ideavimrc` | `~/.ideavimrc` |
 | `config/tmux/` | `~/.config/tmux` |
 | `config/wezterm/` | `~/.config/wezterm` |
+| `config/sheldon/plugins.toml` | `~/.config/sheldon/plugins.toml` |
 | `config/claude/settings.json` | `~/.claude/settings.json` |
 | `config/claude/statusline.sh` | `~/.claude/statusline.sh` |
 | `config/claude/skills/` | `~/.claude/skills` |
