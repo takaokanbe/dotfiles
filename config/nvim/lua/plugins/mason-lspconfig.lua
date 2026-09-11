@@ -62,7 +62,7 @@ return {
         map("n", "[d", function() vim.diagnostic.jump({ count = -1, float = true }) end, "Prev Diagnostic")
 
         -- document highlight
-        if client and client.supports_method("textDocument/documentHighlight") then
+        if client and client:supports_method("textDocument/documentHighlight") then
           vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
             buffer = buf,
             callback = vim.lsp.buf.document_highlight,
