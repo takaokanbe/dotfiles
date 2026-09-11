@@ -28,6 +28,23 @@ scripts/
 ./scripts/link.sh
 ```
 
+`link.sh` はリンクを張るだけで、ツール自体のインストールはしない。各ツールは
+別途入れること。Neovim については以下が必要:
+
+```bash
+brew install neovim tree-sitter-cli
+```
+
+- **Neovim 0.12.0 以上** — nvim-treesitter の `main` ブランチの要件
+- **tree-sitter-cli 0.26.1 以上** — パーサのビルドに使う。npm ではなく
+  パッケージマネージャで入れること
+
+tree-sitter-cli が無いと Neovim 同梱のパーサ（`c` `lua` `markdown`
+`markdown_inline` `query` `vim` `vimdoc`）以外はビルドできず、Go や TypeScript
+など他の言語の構文ハイライトが有効にならない。
+
+ほかに C コンパイラ・`curl`・`tar` が PATH 上に必要だが、macOS では標準で揃う。
+
 ## リンク一覧
 
 | リンク元 | リンク先 |

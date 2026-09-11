@@ -2,6 +2,20 @@
 
 plugin manager には [lazy.nvim](https://github.com/folke/lazy.nvim) を使用。
 
+## 前提
+
+- **Neovim 0.12.0 以上**
+- **[tree-sitter-cli](https://github.com/tree-sitter/tree-sitter) 0.26.1 以上**
+  （`brew install tree-sitter-cli`）
+
+nvim-treesitter は `main` ブランチを使う。`master` は上流で凍結済みで Neovim
+0.11 までしかサポートされず、0.12 ではクエリのディレクティブが落ちる。
+
+`main` はパーサを自前でビルドするため tree-sitter-cli を要求する。無い場合は
+Neovim 同梱のパーサ（`c` `lua` `markdown` `markdown_inline` `query` `vim`
+`vimdoc`）しか使えず、`lua/plugins/nvim-treesitter.lua` に列挙した残りの言語は
+構文ハイライトが有効にならない。
+
 ## Plugin 一覧
 
 | 機能 | Plugin | 説明 |
@@ -14,6 +28,7 @@ plugin manager には [lazy.nvim](https://github.com/folke/lazy.nvim) を使用�
 | Linter | [nvim-lint](https://github.com/mfussenegger/nvim-lint) | 非同期リント |
 | 補完 | [nvim-cmp](https://github.com/hrsh7th/nvim-cmp) | 自動補完エンジン |
 | Syntax Highlight | [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) | Tree-sitter ベースの構文ハイライト |
+| Markdown | [render-markdown.nvim](https://github.com/MeanderingProgrammer/render-markdown.nvim) | バッファ内での Markdown レンダリング |
 | Colorscheme | [catppuccin](https://github.com/catppuccin/nvim) | カラースキーム (mocha) |
 | Statusline | [lualine.nvim](https://github.com/nvim-lualine/lualine.nvim) | ステータスライン |
 | Buffer Tab | [barbar.nvim](https://github.com/romgrk/barbar.nvim) | バッファをタブとして表示 |
