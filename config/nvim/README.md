@@ -7,6 +7,8 @@ plugin manager には [lazy.nvim](https://github.com/folke/lazy.nvim) を使用�
 - **Neovim 0.12.0 以上**
 - **[tree-sitter-cli](https://github.com/tree-sitter/tree-sitter) 0.26.1 以上**
   （`brew install tree-sitter-cli`）
+- **[ripgrep](https://github.com/BurntSushi/ripgrep)**（`brew install ripgrep`）
+  — Telescope の `live_grep` に必要
 
 nvim-treesitter は `main` ブランチを使う。`master` は上流で凍結済みで Neovim
 0.11 までしかサポートされず、0.12 ではクエリのディレクティブが落ちる。

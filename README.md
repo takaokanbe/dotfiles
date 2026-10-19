@@ -32,12 +32,13 @@ scripts/
 別途入れること。Neovim については以下が必要:
 
 ```bash
-brew install neovim tree-sitter-cli
+brew install neovim tree-sitter-cli ripgrep
 ```
 
 - **Neovim 0.12.0 以上** — nvim-treesitter の `main` ブランチの要件
 - **tree-sitter-cli 0.26.1 以上** — パーサのビルドに使う。npm ではなく
   パッケージマネージャで入れること
+- **ripgrep** — Telescope の `live_grep`（`<Space>fg`）が内部で呼ぶ
 
 tree-sitter-cli が無いと Neovim 同梱のパーサ（`c` `lua` `markdown`
 `markdown_inline` `query` `vim` `vimdoc`）以外はビルドできず、Go や TypeScript
