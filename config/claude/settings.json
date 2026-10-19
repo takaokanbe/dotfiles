@@ -122,12 +122,6 @@
     ],
     "defaultMode": "plan"
   },
-  "sandbox": {
-    "network": {
-      "allowedDomains": ["api.github.com"]
-    },
-    "excludedCommands": ["gh *"]
-  },
   "hooks": {
     "Stop": [
       {
@@ -171,7 +165,8 @@
     "code-simplifier@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": true,
     "code-review@claude-plugins-official": true,
-    "pr-review-toolkit@claude-plugins-official": true
+    "pr-review-toolkit@claude-plugins-official": true,
+    "figma@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "okr-sounding-board": {
@@ -188,6 +183,16 @@
     }
   },
   "language": "japanese",
+  "sandbox": {
+    "network": {
+      "allowedDomains": [
+        "api.github.com"
+      ]
+    },
+    "excludedCommands": [
+      "gh *"
+    ]
+  },
   "alwaysThinkingEnabled": true,
   "skipAutoPermissionPrompt": true
 }
